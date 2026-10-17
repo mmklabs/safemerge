@@ -1,0 +1,10 @@
+// Cloudflare settings: serve the static site in ./public. There is no server
+// code; Cloudflare only hands out these files.
+{
+  "name": "safemerge",
+  "compatibility_date": "2025-09-01",
+  "assets": {
+    "directory": "./public",
+    "not_found_handling": "404-page"
+  }
+}

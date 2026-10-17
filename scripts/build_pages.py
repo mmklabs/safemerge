@@ -10,7 +10,7 @@ from pathlib import Path
 
 SITE_NAME = "SafeMerge"
 SITE_URL = "https://safemergefiles.com"  # change if you buy a different domain
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent / "public"
 VERSION = "1"  # bump to make browsers fetch fresh CSS/JS after an update
 
 LOGO = """<svg viewBox="0 0 32 32" aria-hidden="true">

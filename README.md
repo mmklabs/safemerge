@@ -11,7 +11,7 @@ It is a plain static website: HTML, CSS and JavaScript, with no server, no datab
 ## 1. Try it on your Mac
 
 ```bash
-cd ~/projects/public_project/pdf_merger
+cd ~/projects/public_project/pdf_merger/public
 python3 -m http.server 8770
 ```
 
@@ -27,16 +27,15 @@ Then open http://localhost:8770 in your browser. Stop it with Ctrl+C.
 2. Create a new **public or private** repository called `safemerge`.
 3. Push this folder to it (GitHub shows the exact commands after you create the repository).
 
-### Step 3: Host it on Cloudflare Pages
-1. Create a free account at dash.cloudflare.com → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**.
-2. Pick the `safemerge` repository.
-3. Build settings: **Framework preset: None**, **Build command: empty**, **Output directory: `/`**.
-4. Deploy. You get a `*.pages.dev` address within a minute.
-5. **Custom domains** → add `safemergefiles.com`. If you bought the domain at Cloudflare, it connects automatically.
+### Step 3: Host it on Cloudflare
+1. Create a free account at dash.cloudflare.com → **Workers & Pages** → **Create** → **Import a repository** → pick `mmklabs/safemerge`.
+2. Leave **Build command** empty and keep **Deploy command** as `npx wrangler deploy`. The `wrangler.jsonc` file tells Cloudflare to serve the `public` folder.
+3. Deploy. You get a `safemerge.<your-subdomain>.workers.dev` address within a minute.
+4. Project → **Settings** → **Domains & Routes** → add `safemergefiles.com`. If you bought the domain at Cloudflare, it connects automatically.
 
 Every time you push a change to GitHub, the site updates by itself.
 
-(Netlify works the same way and also reads the `_headers` file.)
+(Netlify or Cloudflare Pages work too: set the publish/output directory to `public`.)
 
 ### Step 4: Tell Google about it
 1. Go to **Google Search Console** (search.google.com/search-console) → add your domain → verify it.
@@ -48,7 +47,7 @@ New sites usually take weeks to months to show up in search results.
 
 ## 3. Turn on earnings
 
-All settings live in **`assets/js/config.js`**. Anything left empty stays switched off, and the site works without any of it.
+All settings live in **`public/assets/js/config.js`**. Anything left empty stays switched off, and the site works without any of it.
 
 ### Donations (do this first: instant, no approval)
 1. Make a free page on **Ko-fi** (ko-fi.com) or **Buy Me a Coffee**.
@@ -57,7 +56,7 @@ All settings live in **`assets/js/config.js`**. Anything left empty stays switch
 ### EthicalAds (cookie-free ads, shown to everyone by default)
 1. Apply at ethicalads.io/publishers. They review sites by hand and focus on developer and tech audiences, so approval isn't guaranteed. Apply once you have some traffic.
 2. Put your publisher id in `ethicalAdsPublisher`.
-- Alternative if they decline: **Carbon Ads** (carbonads.net), another privacy-focused ad network. Check their current cookie policy before adding it. It needs a small code change in `assets/js/monetize.js`, so ask for help when you get there.
+- Alternative if they decline: **Carbon Ads** (carbonads.net), another privacy-focused ad network. Check their current cookie policy before adding it. It needs a small code change in `public/assets/js/monetize.js`, so ask for help when you get there.
 
 ### Google AdSense (only for visitors who click "Allow ad cookies")
 1. Apply at adsense.google.com once the site is live on your domain and has its privacy page. Google often rejects brand-new sites with little traffic, so try again after a few months if you're refused.
@@ -65,7 +64,7 @@ All settings live in **`assets/js/config.js`**. Anything left empty stays switch
 3. Create a **display ad unit** (Ads → By ad unit). Copy:
    - the client id (`ca-pub-…`) → `adsenseClient`
    - the slot id → `adsenseSlot`
-4. Edit `ads.txt` at the top of the site with your publisher id (instructions are inside the file).
+4. Edit `public/ads.txt` with your publisher id (instructions are inside the file).
 
 **How it behaves:** first-time visitors see a small banner. Google's code never loads unless the visitor clicks **Allow ad cookies**. If they choose **Cookie-free ads only**, they see EthicalAds. They can change their mind with the **Ad cookie choice** link in the footer. In the EU, UK and Switzerland, Google then shows its own consent form as well.
 
@@ -92,13 +91,13 @@ This isn't legal advice. If the site starts earning real money, a short review b
 | To change… | Edit | Then |
 |---|---|---|
 | Page text, titles, FAQs, header, footer, privacy page | `scripts/build_pages.py` | run `python3 scripts/build_pages.py` |
-| Colours and layout | `assets/css/site.css` | — |
-| How a tool works | `assets/js/tools/*.js` | — |
-| Ads, donation link | `assets/js/config.js` | — |
+| Colours and layout | `public/assets/css/site.css` | — |
+| How a tool works | `public/assets/js/tools/*.js` | — |
+| Ads, donation link | `public/assets/js/config.js` | — |
 
-After changing CSS or JS on the live site, bump `VERSION` in `scripts/build_pages.py`, run it, and bump `CACHE` in `sw.js`, so visitors' browsers fetch the new files.
+After changing CSS or JS on the live site, bump `VERSION` in `scripts/build_pages.py`, run it, and bump `CACHE` in `public/sw.js`, so visitors' browsers fetch the new files.
 
-## Open-source libraries (all stored in `/vendor`, nothing loads from other sites)
+## Open-source libraries (all stored in `public/vendor`, nothing loads from other sites)
 - pdf-lib 1.17.1, MIT licence
 - PDF.js 3.11.174 (Mozilla), Apache 2.0 licence
 - JSZip 3.10.1, MIT licence
