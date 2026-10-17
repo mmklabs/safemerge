@@ -6,5 +6,12 @@
   "assets": {
     "directory": "./public",
     "not_found_handling": "404-page"
-  }
+  },
+  // Keep the safemerge.mmklabs-studio.workers.dev address working too
+  "workers_dev": true,
+  // Attach the site to its domain (Cloudflare creates the DNS records and certificate)
+  "routes": [
+    { "pattern": "safemergefiles.com", "custom_domain": true },
+    { "pattern": "www.safemergefiles.com", "custom_domain": true }
+  ]
 }
