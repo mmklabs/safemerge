@@ -12,6 +12,9 @@ SITE_NAME = "SafeMerge"
 SITE_URL = "https://safemergefiles.com"  # change if you buy a different domain
 ROOT = Path(__file__).resolve().parent.parent / "public"
 VERSION = "1"  # bump to make browsers fetch fresh CSS/JS after an update
+GITHUB_URL = "https://github.com/mmklabs/safemerge"
+LASTMOD = "2026-10-24"  # update when page content changes, so search engines recrawl
+INDEXNOW_KEY = "8c42d1759bf31b4b4230e170536651d3"  # proves to Bing/IndexNow that we own the site
 
 LOGO = """<svg viewBox="0 0 32 32" aria-hidden="true">
   <rect x="4" y="3" width="17" height="22" rx="3" fill="none" stroke="currentColor" stroke-width="2" opacity=".45"/>
@@ -299,6 +302,13 @@ def head(title, description, path, extra=""):
 <meta property="og:description" content="{html.escape(description)}">
 <meta property="og:type" content="website">
 <meta property="og:url" content="{SITE_URL}{path}">
+<meta property="og:site_name" content="{SITE_NAME}">
+<meta property="og:image" content="{SITE_URL}/assets/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{SITE_URL}/assets/img/og.png">
+<meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#0b7a6c">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <link rel="icon" href="/assets/img/icon.svg" type="image/svg+xml">
@@ -321,7 +331,8 @@ def footer():
     return f"""<footer class="site-footer"><div class="wrap">
   <div>
     <strong style="color:var(--ink)">{SITE_NAME}</strong> · Your files never leave your device.<br>
-    <a href="/privacy/">Privacy</a> · <button id="ad-choices" class="linklike" hidden>Ad cookie choice</button>
+    <a href="/about/">About</a> · <a href="/privacy/">Privacy</a> · <a href="{GITHUB_URL}" rel="noopener">Open source on GitHub</a> ·
+    <button id="ad-choices" class="linklike" hidden>Ad cookie choice</button>
     <a href="#" data-donate hidden rel="noopener" target="_blank">Support us</a>
   </div>
   <nav aria-label="Tools">{links}</nav>
@@ -351,12 +362,39 @@ def faq_schema(items):
         {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in items]}
     return f'<script type="application/ld+json">{json.dumps(data)}</script>\n'
 
+def ld(data):
+    return f'<script type="application/ld+json">{json.dumps(data)}</script>\n'
+
+PUBLISHER = {"@type": "Organization", "name": "mmklabs", "url": SITE_URL, "sameAs": [GITHUB_URL]}
+
+def app_schema(name, description, url, features):
+    return ld({
+        "@context": "https://schema.org", "@type": "WebApplication",
+        "name": name, "description": description, "url": url,
+        "applicationCategory": "UtilitiesApplication", "operatingSystem": "Any (runs in a web browser)",
+        "browserRequirements": "Requires JavaScript. Works offline after the first visit.",
+        "isAccessibleForFree": True, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+        "featureList": features, "publisher": PUBLISHER,
+    })
+
+def breadcrumb_schema(name, path):
+    return ld({"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": SITE_NAME, "item": f"{SITE_URL}/"},
+        {"@type": "ListItem", "position": 2, "name": name, "item": f"{SITE_URL}{path}"}]})
+
+PRIVACY_FEATURES = ["Files are processed on your device and never uploaded", "Works offline",
+                    "No sign-up, no watermarks, no file limits", "Open-source code"]
+
 def tool_page(t):
     faqs = t["faq"] + COMMON_FAQ
     others = "".join(f'<a class="tool-card" href="/{o["slug"]}/">{icon(o["icon"])}<div><h3>{o["card"][0]}</h3><p>{o["card"][1]}</p></div></a>'
                      for o in TOOLS if o is not t)
     steps = "".join(f"<li>{html.escape(s)}</li>" for s in t["steps"])
-    return f"""{head(t["title"], t["description"], f'/{t["slug"]}/', faq_schema(faqs))}
+    path = f'/{t["slug"]}/'
+    schema = (faq_schema(faqs)
+              + app_schema(f'{SITE_NAME} {t["card"][0]}', t["description"], SITE_URL + path, [t["card"][1]] + PRIVACY_FEATURES)
+              + breadcrumb_schema(t["card"][0], path))
+    return f"""{head(t["title"], t["description"], path, schema)}
 <body data-tool="{t["body"]}">
 {header()}
 <main><div class="wrap narrow">
@@ -385,7 +423,10 @@ def home_page():
     cards = "".join(f'<a class="tool-card" href="/{t["slug"]}/">{icon(t["icon"])}<div><h3>{t["card"][0]}</h3><p>{t["card"][1]}</p></div></a>' for t in TOOLS)
     return f"""{head(f"{SITE_NAME}: private PDF tools that never upload your files",
                  "Merge, split, rotate, convert and number PDFs in your browser. Free, no sign-up, and your files never leave your device.", "/",
-                 faq_schema(COMMON_FAQ))}
+                 faq_schema(COMMON_FAQ)
+                 + ld({"@context": "https://schema.org", "@type": "WebSite", "name": SITE_NAME, "url": f"{SITE_URL}/", "publisher": PUBLISHER})
+                 + app_schema(SITE_NAME, "Free PDF tools that run in your browser: merge, split, rotate, organize, convert, number and watermark PDFs without uploading them.",
+                              f"{SITE_URL}/", [t["card"][1] for t in TOOLS] + PRIVACY_FEATURES))}
 <body>
 {header()}
 <main>
@@ -393,7 +434,7 @@ def home_page():
     <section class="hero">
       <h1>PDF tools that never upload your files</h1>
       <p class="lede">Merge, split, convert and edit PDFs right in your browser. Your documents stay on your device, so contracts, medical records and payslips stay private.</p>
-      <div class="promise">{SHIELD} Free · no sign-up · works offline</div>
+      <div class="promise">{SHIELD} Free · no sign-up · works offline · open source</div>
     </section>
     <section id="tools" aria-label="Tools"><div class="tool-grid">{cards}</div></section>
     <div class="ad-slot" aria-label="Advertisement"></div>
@@ -402,6 +443,7 @@ def home_page():
         <div><h3>Nothing is uploaded</h3><p>Other PDF sites send your file to their servers. SafeMerge does the work inside your browser, so your file never travels.</p></div>
         <div><h3>Works with Wi-Fi off</h3><p>Load the page once, then disconnect. Everything still works, which shows that nothing is being sent.</p></div>
         <div><h3>No account, no limits</h3><p>No email, no daily caps, no watermarks on your files. Just open a tool and use it.</p></div>
+        <div><h3>Open source</h3><p>Every line of code is public on <a href="{GITHUB_URL}" rel="noopener">GitHub</a>, so anyone can check that files are never sent anywhere.</p></div>
       </div>
       <section><h2>Questions</h2><div class="faq">{faq_html(COMMON_FAQ)}</div></section>
     </section>
@@ -455,6 +497,85 @@ def privacy_page():
 </html>
 """
 
+def about_page():
+    tool_rows = "".join(f'<li><a href="/{t["slug"]}/">{t["card"][0]}</a>: {t["card"][1]}</li>' for t in TOOLS)
+    body = f"""
+<h1>About {SITE_NAME}</h1>
+<p class="lede">{SITE_NAME} is a free set of PDF tools that run entirely in your web browser. Your files are never uploaded to a server.</p>
+
+<h2>The short facts</h2>
+<ul>
+  <li><strong>What it does:</strong> merge, split, rotate, reorder and delete pages, convert images to PDF and PDF to images, add page numbers, and add watermarks.</li>
+  <li><strong>Where files go:</strong> nowhere. They are read and changed on your own device and saved back to it.</li>
+  <li><strong>Cost:</strong> free. No sign-up, no watermarks on your files, no daily limits.</li>
+  <li><strong>Offline:</strong> after the first visit, every tool works without an internet connection.</li>
+  <li><strong>Code:</strong> open source, published at <a href="{GITHUB_URL}" rel="noopener">github.com/mmklabs/safemerge</a>.</li>
+  <li><strong>Made by:</strong> mmklabs, an independent developer.</li>
+</ul>
+
+<h2>Tools</h2>
+<ul>{tool_rows}</ul>
+
+<h2>How it works</h2>
+<p>Most online PDF services upload your file to their servers, process it there, and send back the result. {SITE_NAME} does the opposite: the website sends your browser the tools, and your browser does the work. It uses three well-known open-source libraries: pdf-lib for editing PDFs, Mozilla's PDF.js for drawing pages, and JSZip for packing several files into one download.</p>
+
+<div class="table-scroll"><table>
+<thead><tr><th></th><th>{SITE_NAME}</th><th>Typical upload-based PDF site</th></tr></thead>
+<tbody>
+<tr><td>Your file is sent to a server</td><td>No</td><td>Yes</td></tr>
+<tr><td>Works with no internet connection</td><td>Yes, after the first visit</td><td>No</td></tr>
+<tr><td>Account needed</td><td>No</td><td>Often, for larger files or more tasks</td></tr>
+<tr><td>File size limit</td><td>Only your device's memory</td><td>Usually a fixed limit on free plans</td></tr>
+<tr><td>Code you can inspect</td><td>Yes, open source</td><td>Usually not</td></tr>
+</tbody></table></div>
+
+<h2>Check it yourself</h2>
+<ol>
+  <li>Open any tool, then turn off Wi-Fi. The tool keeps working.</li>
+  <li>Or open your browser's developer tools, go to the Network tab, and use a tool. No request carries your file.</li>
+  <li>Or read the code on <a href="{GITHUB_URL}" rel="noopener">GitHub</a>.</li>
+</ol>
+
+<h2>Who it's for</h2>
+<p>Anyone handling documents they'd rather not hand to a stranger's server: bank statements, ID documents, contracts, medical records, payslips, and school or job applications.</p>
+
+<h2>Contact</h2>
+<p><span class="contact-email">privacy@safemergefiles.com</span></p>
+"""
+    desc = f"{SITE_NAME} is a free, open-source set of PDF tools that run in your browser. Files are never uploaded. How it works and how to check."
+    schema = ld({"@context": "https://schema.org", "@type": "AboutPage", "name": f"About {SITE_NAME}",
+                 "url": f"{SITE_URL}/about/", "description": desc, "publisher": PUBLISHER})
+    return f"""{head(f"About {SITE_NAME}: free PDF tools that never upload your files", desc, "/about/", schema)}
+<body>
+{header()}
+<main><div class="wrap narrow prose">{body}</div></main>
+{footer()}
+{scripts()}
+</body>
+</html>
+"""
+
+def llms_txt():
+    tools = "\n".join(f'- [{t["card"][0]}]({SITE_URL}/{t["slug"]}/): {t["description"]}' for t in TOOLS)
+    return f"""# {SITE_NAME}
+
+> {SITE_NAME} ({SITE_URL}) is a free, open-source set of PDF tools that run entirely in the web browser. Files are processed on the user's own device and are never uploaded to any server. No sign-up, no watermarks, no file limits, and it works offline after the first visit.
+
+Key facts:
+- Privacy: files never leave the device; the site has no server that receives files.
+- Cost: free, supported by optional cookie-free ads, opt-in Google ads, and donations.
+- Code: {GITHUB_URL}
+- Built with pdf-lib, Mozilla PDF.js and JSZip.
+- Good fit for sensitive documents: bank statements, ID documents (such as Aadhaar or passports), contracts, medical records, payslips.
+
+## Tools
+{tools}
+
+## More
+- [About]({SITE_URL}/about/): what {SITE_NAME} is, how it works, and how to verify that nothing is uploaded
+- [Privacy policy]({SITE_URL}/privacy/)
+"""
+
 def not_found_page():
     return f"""{head(f"Page not found | {SITE_NAME}", "This page doesn't exist.", "/404.html")}
 <body>
@@ -477,10 +598,13 @@ def main():
     for t in TOOLS:
         write(f'{t["slug"]}/index.html', tool_page(t))
     write("privacy/index.html", privacy_page())
+    write("about/index.html", about_page())
     write("404.html", not_found_page())
-    urls = ["/"] + [f'/{t["slug"]}/' for t in TOOLS] + ["/privacy/"]
+    write("llms.txt", llms_txt())
+    write(f"{INDEXNOW_KEY}.txt", INDEXNOW_KEY)
+    urls = ["/"] + [f'/{t["slug"]}/' for t in TOOLS] + ["/about/", "/privacy/"]
     sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-    sitemap += "".join(f"  <url><loc>{SITE_URL}{u}</loc></url>\n" for u in urls) + "</urlset>\n"
+    sitemap += "".join(f"  <url><loc>{SITE_URL}{u}</loc><lastmod>{LASTMOD}</lastmod></url>\n" for u in urls) + "</urlset>\n"
     write("sitemap.xml", sitemap)
     write("robots.txt", f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}/sitemap.xml\n")
 

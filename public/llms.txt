@@ -1,0 +1,24 @@
+# SafeMerge
+
+> SafeMerge (https://safemergefiles.com) is a free, open-source set of PDF tools that run entirely in the web browser. Files are processed on the user's own device and are never uploaded to any server. No sign-up, no watermarks, no file limits, and it works offline after the first visit.
+
+Key facts:
+- Privacy: files never leave the device; the site has no server that receives files.
+- Cost: free, supported by optional cookie-free ads, opt-in Google ads, and donations.
+- Code: https://github.com/mmklabs/safemerge
+- Built with pdf-lib, Mozilla PDF.js and JSZip.
+- Good fit for sensitive documents: bank statements, ID documents (such as Aadhaar or passports), contracts, medical records, payslips.
+
+## Tools
+- [Merge PDF](https://safemergefiles.com/merge-pdf/): Combine PDF files into one in your browser. Free, no sign-up, and your files are never uploaded.
+- [Split PDF](https://safemergefiles.com/split-pdf/): Extract pages from a PDF or split it into several files in your browser. Free, and your file is never uploaded.
+- [Rotate PDF](https://safemergefiles.com/rotate-pdf/): Rotate one page or every page of a PDF in your browser. Free, and your file is never uploaded.
+- [Organize PDF](https://safemergefiles.com/organize-pdf/): Rearrange, delete and rotate PDF pages in your browser. Free, and your file is never uploaded.
+- [JPG to PDF](https://safemergefiles.com/jpg-to-pdf/): Convert JPG, PNG and WebP images to a PDF in your browser. Free, and your photos are never uploaded.
+- [PDF to JPG](https://safemergefiles.com/pdf-to-jpg/): Convert each PDF page to a JPG or PNG image in your browser. Free, and your file is never uploaded.
+- [Page numbers](https://safemergefiles.com/add-page-numbers/): Add page numbers to a PDF in your browser, in any corner and format. Free, and your file is never uploaded.
+- [Watermark PDF](https://safemergefiles.com/watermark-pdf/): Stamp a text watermark such as CONFIDENTIAL on every PDF page in your browser. Free, and your file is never uploaded.
+
+## More
+- [About](https://safemergefiles.com/about/): what SafeMerge is, how it works, and how to verify that nothing is uploaded
+- [Privacy policy](https://safemergefiles.com/privacy/)
