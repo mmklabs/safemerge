@@ -2,6 +2,8 @@
 
 Private PDF tools that run entirely in the browser. Files are never uploaded.
 
+**Copyright © 2026 mmklabs. All rights reserved.** The code is public so anyone can verify that files never leave their device. It is not open source: see [COPYRIGHT](COPYRIGHT).
+
 **Tools:** Merge · Split · Rotate · Organize (reorder/delete) · Images → PDF · PDF → images · Page numbers · Watermark
 
 It is a plain static website: HTML, CSS and JavaScript, with no server, no database and no build tools to install. Any static host can serve it for free.
@@ -97,7 +99,7 @@ This isn't legal advice. If the site starts earning real money, a short review b
 
 After changing CSS or JS on the live site, bump `VERSION` in `scripts/build_pages.py`, run it, and bump `CACHE` in `public/sw.js`, so visitors' browsers fetch the new files.
 
-## Open-source libraries (all stored in `public/vendor`, nothing loads from other sites)
+## Third-party libraries (all stored in `public/vendor`, nothing loads from other sites)
 - pdf-lib 1.17.1, MIT licence
 - PDF.js 3.11.174 (Mozilla), Apache 2.0 licence
 - JSZip 3.10.1, MIT licence

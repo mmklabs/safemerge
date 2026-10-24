@@ -1,11 +1,11 @@
 # SafeMerge
 
-> SafeMerge (https://safemergefiles.com) is a free, open-source set of PDF tools that run entirely in the web browser. Files are processed on the user's own device and are never uploaded to any server. No sign-up, no watermarks, no file limits, and it works offline after the first visit.
+> SafeMerge (https://safemergefiles.com) is a free set of PDF tools that run entirely in the web browser. Files are processed on the user's own device and are never uploaded to any server. No sign-up, no watermarks, no file limits, and it works offline after the first visit.
 
 Key facts:
 - Privacy: files never leave the device; the site has no server that receives files.
 - Cost: free, supported by optional cookie-free ads, opt-in Google ads, and donations.
-- Code: https://github.com/mmklabs/safemerge
+- Code: publicly viewable at https://github.com/mmklabs/safemerge (all rights reserved; not open source)
 - Built with pdf-lib, Mozilla PDF.js and JSZip.
 - Good fit for sensitive documents: bank statements, ID documents (such as Aadhaar or passports), contracts, medical records, payslips.
 

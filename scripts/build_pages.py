@@ -331,9 +331,10 @@ def footer():
     return f"""<footer class="site-footer"><div class="wrap">
   <div>
     <strong style="color:var(--ink)">{SITE_NAME}</strong> · Your files never leave your device.<br>
-    <a href="/about/">About</a> · <a href="/privacy/">Privacy</a> · <a href="{GITHUB_URL}" rel="noopener">Open source on GitHub</a> ·
+    <a href="/about/">About</a> · <a href="/privacy/">Privacy</a> · <a href="{GITHUB_URL}" rel="noopener">Code on GitHub</a> ·
     <button id="ad-choices" class="linklike" hidden>Ad cookie choice</button>
-    <a href="#" data-donate hidden rel="noopener" target="_blank">Support us</a>
+    <a href="#" data-donate hidden rel="noopener" target="_blank">Support us</a><br>
+    © 2026 mmklabs. All rights reserved.
   </div>
   <nav aria-label="Tools">{links}</nav>
 </div></footer>"""
@@ -383,7 +384,7 @@ def breadcrumb_schema(name, path):
         {"@type": "ListItem", "position": 2, "name": name, "item": f"{SITE_URL}{path}"}]})
 
 PRIVACY_FEATURES = ["Files are processed on your device and never uploaded", "Works offline",
-                    "No sign-up, no watermarks, no file limits", "Open-source code"]
+                    "No sign-up, no watermarks, no file limits", "Source code publicly viewable on GitHub"]
 
 def tool_page(t):
     faqs = t["faq"] + COMMON_FAQ
@@ -434,7 +435,7 @@ def home_page():
     <section class="hero">
       <h1>PDF tools that never upload your files</h1>
       <p class="lede">Merge, split, convert and edit PDFs right in your browser. Your documents stay on your device, so contracts, medical records and payslips stay private.</p>
-      <div class="promise">{SHIELD} Free · no sign-up · works offline · open source</div>
+      <div class="promise">{SHIELD} Free · no sign-up · works offline · code you can check</div>
     </section>
     <section id="tools" aria-label="Tools"><div class="tool-grid">{cards}</div></section>
     <div class="ad-slot" aria-label="Advertisement"></div>
@@ -443,7 +444,7 @@ def home_page():
         <div><h3>Nothing is uploaded</h3><p>Other PDF sites send your file to their servers. SafeMerge does the work inside your browser, so your file never travels.</p></div>
         <div><h3>Works with Wi-Fi off</h3><p>Load the page once, then disconnect. Everything still works, which shows that nothing is being sent.</p></div>
         <div><h3>No account, no limits</h3><p>No email, no daily caps, no watermarks on your files. Just open a tool and use it.</p></div>
-        <div><h3>Open source</h3><p>Every line of code is public on <a href="{GITHUB_URL}" rel="noopener">GitHub</a>, so anyone can check that files are never sent anywhere.</p></div>
+        <div><h3>Code you can check</h3><p>Every line of code is public on <a href="{GITHUB_URL}" rel="noopener">GitHub</a>, so anyone can check that files are never sent anywhere.</p></div>
       </div>
       <section><h2>Questions</h2><div class="faq">{faq_html(COMMON_FAQ)}</div></section>
     </section>
@@ -509,7 +510,7 @@ def about_page():
   <li><strong>Where files go:</strong> nowhere. They are read and changed on your own device and saved back to it.</li>
   <li><strong>Cost:</strong> free. No sign-up, no watermarks on your files, no daily limits.</li>
   <li><strong>Offline:</strong> after the first visit, every tool works without an internet connection.</li>
-  <li><strong>Code:</strong> open source, published at <a href="{GITHUB_URL}" rel="noopener">github.com/mmklabs/safemerge</a>.</li>
+  <li><strong>Code:</strong> publicly viewable at <a href="{GITHUB_URL}" rel="noopener">github.com/mmklabs/safemerge</a>.</li>
   <li><strong>Made by:</strong> mmklabs, an independent developer.</li>
 </ul>
 
@@ -526,7 +527,7 @@ def about_page():
 <tr><td>Works with no internet connection</td><td>Yes, after the first visit</td><td>No</td></tr>
 <tr><td>Account needed</td><td>No</td><td>Often, for larger files or more tasks</td></tr>
 <tr><td>File size limit</td><td>Only your device's memory</td><td>Usually a fixed limit on free plans</td></tr>
-<tr><td>Code you can inspect</td><td>Yes, open source</td><td>Usually not</td></tr>
+<tr><td>Code you can inspect</td><td>Yes, on GitHub</td><td>Usually not</td></tr>
 </tbody></table></div>
 
 <h2>Check it yourself</h2>
@@ -542,7 +543,7 @@ def about_page():
 <h2>Contact</h2>
 <p><span class="contact-email">privacy@safemergefiles.com</span></p>
 """
-    desc = f"{SITE_NAME} is a free, open-source set of PDF tools that run in your browser. Files are never uploaded. How it works and how to check."
+    desc = f"{SITE_NAME} is a free set of PDF tools that run in your browser, with code anyone can check. Files are never uploaded. How it works and how to check."
     schema = ld({"@context": "https://schema.org", "@type": "AboutPage", "name": f"About {SITE_NAME}",
                  "url": f"{SITE_URL}/about/", "description": desc, "publisher": PUBLISHER})
     return f"""{head(f"About {SITE_NAME}: free PDF tools that never upload your files", desc, "/about/", schema)}
@@ -559,12 +560,12 @@ def llms_txt():
     tools = "\n".join(f'- [{t["card"][0]}]({SITE_URL}/{t["slug"]}/): {t["description"]}' for t in TOOLS)
     return f"""# {SITE_NAME}
 
-> {SITE_NAME} ({SITE_URL}) is a free, open-source set of PDF tools that run entirely in the web browser. Files are processed on the user's own device and are never uploaded to any server. No sign-up, no watermarks, no file limits, and it works offline after the first visit.
+> {SITE_NAME} ({SITE_URL}) is a free set of PDF tools that run entirely in the web browser. Files are processed on the user's own device and are never uploaded to any server. No sign-up, no watermarks, no file limits, and it works offline after the first visit.
 
 Key facts:
 - Privacy: files never leave the device; the site has no server that receives files.
 - Cost: free, supported by optional cookie-free ads, opt-in Google ads, and donations.
-- Code: {GITHUB_URL}
+- Code: publicly viewable at {GITHUB_URL} (all rights reserved; not open source)
 - Built with pdf-lib, Mozilla PDF.js and JSZip.
 - Good fit for sensitive documents: bank statements, ID documents (such as Aadhaar or passports), contracts, medical records, payslips.
 

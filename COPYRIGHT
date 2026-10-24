@@ -1,0 +1,12 @@
+Copyright (c) 2026 mmklabs. All rights reserved.
+
+The SafeMerge source code is published so anyone can check that files are
+never uploaded. Publishing it does not grant permission to copy, modify,
+host or redistribute it. No licence is granted except where stated below.
+
+Third-party libraries in public/vendor/ keep their own licences:
+- pdf-lib (MIT) — public/vendor/pdf-lib/LICENSE.md
+- PDF.js (Apache 2.0) — public/vendor/pdfjs/LICENSE
+- JSZip (MIT or GPLv3) — public/vendor/jszip/LICENSE.md
+
+Contact: privacy@safemergefiles.com
