@@ -11,7 +11,7 @@ from pathlib import Path
 SITE_NAME = "SafeMerge"
 SITE_URL = "https://safemergefiles.com"  # change if you buy a different domain
 ROOT = Path(__file__).resolve().parent.parent / "public"
-VERSION = "1"  # bump to make browsers fetch fresh CSS/JS after an update
+VERSION = "2"  # bump to make browsers fetch fresh CSS/JS after an update
 GITHUB_URL = "https://github.com/mmklabs/safemerge"
 LASTMOD = "2026-10-24"  # update when page content changes, so search engines recrawl
 INDEXNOW_KEY = "8c42d1759bf31b4b4230e170536651d3"  # proves to Bing/IndexNow that we own the site
@@ -26,6 +26,7 @@ SHIELD = """<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5l5.5 2v4c
 
 # Small line icons for the home page cards
 ICONS = {
+    "compress": '<path d="M9 4h14v24H9z"/><path d="M16 7v7m-3.5-3.5L16 14l3.5-3.5M16 25v-7m-3.5 3.5L16 18l3.5 3.5"/>',
     "merge": '<path d="M6 6h10v12H6zM14 10h10v12H14z"/><path d="M18 26v4m-3-3 3 3 3-3"/>',
     "split": '<path d="M8 6h16v20H8z"/><path d="M4 16h24" stroke-dasharray="3 3"/>',
     "rotate": '<path d="M10 8h12v18H10z"/><path d="M26 6a10 10 0 0 0-8-3m8 3V1m0 5h-5"/>',
@@ -74,6 +75,62 @@ def radios(name, options, checked):
         out.append(f'<label><input type="radio" name="{name}" value="{value}"{c}> {label}</label>')
     return '<div class="choices">' + "".join(out) + "</div>"
 
+COMPRESS_UI = drop("Drop a PDF here", "a PDF file") + """
+<div id="workspace" class="tool" hidden>
+""" + file_head() + """
+  <div class="options">
+    <fieldset class="field full"><legend>Make it smaller than</legend>""" + radios("target", [
+        ("100", "100 KB"), ("200", "200 KB"), ("500", "500 KB"), ("1024", "1 MB"),
+        ("custom", "Other size"), ("balanced", "No limit, just smaller")], "balanced") + """</fieldset>
+    <label id="custom-field" class="field" hidden><span>Size in KB</span>
+      <input id="custom-kb" type="number" min="10" step="1" value="150" inputmode="numeric"></label>
+    <label class="check-row full"><input id="gray" type="checkbox"> Black &amp; white: much smaller for text documents and scans</label>
+    <label class="check-row full"><input id="allow-flatten" type="checkbox" checked> If needed, turn pages into images to reach the size (text won't be selectable)</label>
+  </div>
+  <div class="bar"><span class="grow"></span><button id="run" class="btn primary" disabled>Compress PDF</button></div>
+  <section id="result" class="result" hidden aria-live="polite">
+    <div class="result-head">
+      <div><div id="result-sizes" class="result-sizes"></div><div id="result-saved" class="meta"></div></div>
+      <div id="result-verdict" class="verdict"></div>
+    </div>
+    <p id="result-note" class="result-note"></p>
+    <div class="result-body">
+      <div id="preview" class="preview" role="button" tabindex="0" title="View full size"></div>
+      <div class="result-actions">
+        <p class="meta">Tap the preview to check the text is readable at full size.</p>
+        <button id="download" class="btn primary">Download</button>
+      </div>
+    </div>
+  </section>
+</div>
+<div id="zoom" class="zoom" hidden role="dialog" aria-label="Full-size preview">
+  <div class="zoom-bar"><strong>Full-size preview</strong><button id="zoom-close" class="btn small">Close</button></div>
+  <div class="zoom-body"></div>
+</div>"""
+
+COMPRESS_STEPS = ["Drop your PDF in.",
+                  "Pick the size you need, such as 100 KB or 200 KB, or type your own.",
+                  "Click Compress PDF, check the preview, then download."]
+
+COMPRESS_FAQ = [
+    ("Will the text stay sharp?",
+     "Usually, yes. SafeMerge first shrinks only the photos and scans inside the PDF, so typed text stays sharp and selectable. Only if that isn't enough does it turn pages into images, and it tells you when it does."),
+    ("What if it can't reach my size?",
+     "You get the smallest version possible and a clear message. Ticking Black & white often halves the size of scanned documents. For very strict limits, remove pages you don't need first with Split PDF."),
+]
+
+def compress_variant(kb, label, extra_faq):
+    return {
+        "slug": f"compress-pdf-to-{label.lower().replace(' ', '')}", "icon": "compress", "js": ["compress.js"],
+        "body": "compress", "pdfjs": True, "target": str(kb), "variant": True,
+        "card": (f"Compress PDF to {label}", f"Shrink a PDF to under {label}."),
+        "title": f"Compress PDF to {label} free, without uploading | SafeMerge",
+        "description": f"Make a PDF smaller than {label} for upload forms and email, right in your browser. Free, no sign-up, and your file never leaves your device.",
+        "h1": f"Compress PDF to {label}",
+        "lede": f"Many upload forms only accept PDFs under {label}. Get yours under the limit in seconds, without sending it anywhere.",
+        "ui": COMPRESS_UI, "steps": COMPRESS_STEPS, "faq": extra_faq + COMPRESS_FAQ,
+    }
+
 TOOLS = [
     {
         "slug": "merge-pdf", "icon": "merge", "js": ["merge.js"], "body": "merge",
@@ -94,6 +151,17 @@ TOOLS = [
                   "Click Merge PDFs. The combined file saves to your device."],
         "faq": [("Can I merge password-protected PDFs?",
                  "Not yet. Remove the password in your PDF reader first, then merge.")],
+    },
+    {
+        "slug": "compress-pdf", "icon": "compress", "js": ["compress.js"], "body": "compress", "pdfjs": True,
+        "card": ("Compress PDF", "Shrink a PDF to 100 KB, 200 KB or any size."),
+        "title": "Compress PDF to any size, free and private | SafeMerge",
+        "description": "Reduce PDF file size to 100 KB, 200 KB, 500 KB or any size you need, right in your browser. Text stays sharp, and your file is never uploaded.",
+        "h1": "Compress PDF",
+        "lede": "Shrink a PDF to the size an upload form or email allows, such as 100 KB or 200 KB. Text stays sharp.",
+        "ui": COMPRESS_UI, "steps": COMPRESS_STEPS,
+        "faq": [("How do I compress a PDF to exactly 100 KB?",
+                 "Choose 100 KB and click Compress PDF. SafeMerge tries gentle settings first and keeps the best-quality version that fits under your limit.")] + COMPRESS_FAQ,
     },
     {
         "slug": "split-pdf", "icon": "split", "js": ["split.js"], "body": "split", "pdfjs": True, "zip": True,
@@ -285,6 +353,18 @@ TOOLS = [
     },
 ]
 
+# Extra search-landing pages: same tools with a preset, not shown as separate cards
+VARIANTS = [
+    compress_variant(100, "100 KB", [("Is 100 KB enough for a multi-page PDF?",
+        "For one or two pages of text or a clear scan, usually yes. Long scanned documents may need Black & white, or fewer pages.")]),
+    compress_variant(200, "200 KB", [("Why do forms ask for PDFs under 200 KB?",
+        "Many application and government portals cap uploads at 200 KB to keep their servers fast. SafeMerge gets you under it without uploading your file anywhere.")]),
+    compress_variant(500, "500 KB", [("Will 500 KB keep my scan readable?",
+        "Almost always. 500 KB leaves room for good-quality scans of several pages.")]),
+    compress_variant(1024, "1 MB", [("How do I make a PDF smaller than 1 MB for email?",
+        "Choose 1 MB and click Compress PDF. Most PDFs reach it with only the images shrunk, so text stays sharp.")]),
+]
+
 # ---------------------------------------------------------------------------
 # Page shell
 # ---------------------------------------------------------------------------
@@ -320,7 +400,7 @@ def header():
     return f"""<header class="site-header"><div class="wrap">
   <a class="brand" href="/">{LOGO}<span>{SITE_NAME}</span></a>
   <nav class="site-nav" aria-label="Main">
-    <a href="/merge-pdf/">Merge</a><a href="/split-pdf/">Split</a><a href="/organize-pdf/">Organize</a>
+    <a href="/merge-pdf/">Merge</a><a href="/compress-pdf/">Compress</a><a href="/split-pdf/">Split</a>
     <a href="/#tools">All tools</a>
     <a class="donate" href="#" data-donate hidden rel="noopener" target="_blank">Support us</a>
   </nav>
@@ -396,7 +476,7 @@ def tool_page(t):
               + app_schema(f'{SITE_NAME} {t["card"][0]}', t["description"], SITE_URL + path, [t["card"][1]] + PRIVACY_FEATURES)
               + breadcrumb_schema(t["card"][0], path))
     return f"""{head(t["title"], t["description"], path, schema)}
-<body data-tool="{t["body"]}">
+<body data-tool="{t["body"]}"{f' data-target="{t["target"]}"' if t.get("target") else ""}>
 {header()}
 <main><div class="wrap narrow">
   <h1>{t["h1"]}</h1>
@@ -596,14 +676,14 @@ def write(path, text):
 
 def main():
     write("index.html", home_page())
-    for t in TOOLS:
+    for t in TOOLS + VARIANTS:
         write(f'{t["slug"]}/index.html', tool_page(t))
     write("privacy/index.html", privacy_page())
     write("about/index.html", about_page())
     write("404.html", not_found_page())
     write("llms.txt", llms_txt())
     write(f"{INDEXNOW_KEY}.txt", INDEXNOW_KEY)
-    urls = ["/"] + [f'/{t["slug"]}/' for t in TOOLS] + ["/about/", "/privacy/"]
+    urls = ["/"] + [f'/{t["slug"]}/' for t in TOOLS + VARIANTS] + ["/about/", "/privacy/"]
     sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
     sitemap += "".join(f"  <url><loc>{SITE_URL}{u}</loc><lastmod>{LASTMOD}</lastmod></url>\n" for u in urls) + "</urlset>\n"
     write("sitemap.xml", sitemap)
