@@ -11,7 +11,7 @@ from pathlib import Path
 SITE_NAME = "SafeMerge"
 SITE_URL = "https://safemergefiles.com"  # change if you buy a different domain
 ROOT = Path(__file__).resolve().parent.parent / "public"
-VERSION = "3"  # bump to make browsers fetch fresh CSS/JS after an update
+VERSION = "4"  # bump to make browsers fetch fresh CSS/JS after an update
 GITHUB_URL = "https://github.com/mmklabs/safemerge"
 LASTMOD = "2026-10-27"  # update when page content changes, so search engines recrawl
 INDEXNOW_KEY = "8c42d1759bf31b4b4230e170536651d3"  # proves to Bing/IndexNow that we own the site
@@ -26,6 +26,7 @@ SHIELD = """<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5l5.5 2v4c
 
 # Small line icons for the home page cards
 ICONS = {
+    "idcard": '<path d="M6 5h20v22H6z"/><rect x="9" y="8" width="14" height="7" rx="1"/><rect x="9" y="18" width="14" height="7" rx="1"/>',
     "resize": '<path d="M5 9h15v15H5z"/><path d="M20 12h7v15H12v-3"/><path d="M9 20l4-4 3 3"/>',
     "compress": '<path d="M9 4h14v24H9z"/><path d="M16 7v7m-3.5-3.5L16 14l3.5-3.5M16 25v-7m-3.5 3.5L16 18l3.5 3.5"/>',
     "merge": '<path d="M6 6h10v12H6zM14 10h10v12H14z"/><path d="M18 26v4m-3-3 3 3 3-3"/>',
@@ -204,6 +205,59 @@ def resize_variant(slug, h1, card, lede, data, faq):
         "h1": h1, "lede": lede, "ui": RESIZE_UI, "steps": RESIZE_STEPS, "faq": faq + RESIZE_FAQ,
     }
 
+IDCARD_UI = """
+<div class="tool">
+  <div class="id-slots">
+    <div class="id-slot" data-side="front">
+      <h3>Front</h3>
+      <div class="dropzone compact" tabindex="0" role="button" aria-label="Choose the front of the card">
+        <strong>Drop the front</strong><span> or click to choose</span>
+        <input type="file" accept="image/*" hidden>
+      </div>
+      <div class="crop-area" hidden><canvas aria-label="Crop the front of the card"></canvas></div>
+      <div class="bar slot-actions" hidden>
+        <button class="btn small" data-act="rotate">↻ Rotate</button>
+        <button class="btn small" data-act="auto-crop">Find card</button>
+        <button class="btn small" data-act="reset-crop">Whole photo</button>
+        <button class="btn small" data-act="remove">Remove</button>
+      </div>
+    </div>
+    <div class="id-slot" data-side="back">
+      <h3>Back</h3>
+      <div class="dropzone compact" tabindex="0" role="button" aria-label="Choose the back of the card">
+        <strong>Drop the back</strong><span> or click to choose</span>
+        <input type="file" accept="image/*" hidden>
+      </div>
+      <div class="crop-area" hidden><canvas aria-label="Crop the back of the card"></canvas></div>
+      <div class="bar slot-actions" hidden>
+        <button class="btn small" data-act="rotate">↻ Rotate</button>
+        <button class="btn small" data-act="auto-crop">Find card</button>
+        <button class="btn small" data-act="reset-crop">Whole photo</button>
+        <button class="btn small" data-act="remove">Remove</button>
+      </div>
+    </div>
+  </div>
+  <p id="crop-hint" class="meta" hidden>SafeMerge tries to find the card for you. Drag the white corners to adjust, or drag inside the box to move it.</p>
+  <div id="options" class="options">
+    <fieldset class="field"><legend>Page</legend>""" + radios("page", [("a4", "A4"), ("letter", "Letter")], "a4") + """</fieldset>
+    <fieldset class="field"><legend>Card size</legend>""" + radios("cardsize", [("actual", "Real card size"), ("large", "Larger")], "actual") + """</fieldset>
+    <fieldset class="field"><legend>Layout</legend>""" + radios("arrange", [("stacked", "One above the other"), ("side", "Side by side")], "stacked") + """</fieldset>
+    <fieldset class="field"><legend>Save as</legend>""" + radios("output", [("pdf", "PDF"), ("jpg", "JPG")], "pdf") + """</fieldset>
+    <label class="field"><span>Max file size (KB)</span><input id="max-kb" type="number" min="10" placeholder="No limit" inputmode="numeric"></label>
+    <label class="check-row full"><input id="gray" type="checkbox"> Black &amp; white (like a photocopy)</label>
+    <label class="check-row full"><input id="cutlines" type="checkbox"> Add dashed cut lines for printing</label>
+  </div>
+  <div class="bar"><button id="reset" class="btn">Start over</button><span class="grow"></span><button id="run" class="btn primary" disabled>Create page</button></div>
+  <section id="result" class="result" hidden aria-live="polite">
+    <div class="result-head"><div id="result-sizes" class="result-sizes"></div><div id="result-verdict" class="verdict"></div></div>
+    <p id="result-note" class="result-note" hidden></p>
+    <div class="result-body">
+      <div id="preview" class="preview page-preview"></div>
+      <div class="result-actions"><button id="download" class="btn primary">Download</button></div>
+    </div>
+  </section>
+</div>"""
+
 TOOLS = [
     {
         "slug": "merge-pdf", "icon": "merge", "js": ["merge.js"], "body": "merge",
@@ -246,6 +300,24 @@ TOOLS = [
         "ui": RESIZE_UI, "steps": RESIZE_STEPS,
         "faq": [("Does resizing make my photo blurry?",
                  "SafeMerge uses high-quality scaling and picks the best JPG quality that fits your size limit, so photos stay as sharp as the limit allows.")] + RESIZE_FAQ,
+    },
+    {
+        "slug": "id-card-on-one-page", "icon": "idcard", "js": ["id-card.js"], "body": "idcard",
+        "card": ("ID card on one page", "Front and back of a card on one page."),
+        "title": "Put both sides of an ID card on one page (PDF or JPG) | SafeMerge",
+        "description": "Combine the front and back of an ID card, driving licence or any card onto one A4 or Letter page, at real size, as PDF or JPG. Free, and your photos are never uploaded.",
+        "h1": "ID card front and back on one page",
+        "lede": "Put both sides of an ID card, driving licence or any card onto one page, ready to print or upload. Crop each side, keep the real card size, and set a size limit if your form has one.",
+        "ui": IDCARD_UI,
+        "steps": ["Add a photo or scan of the front, then the back.",
+                  "Drag the corners to crop each side to the card's edges. Rotate if needed.",
+                  "Choose the page and format, then click Create page and download."],
+        "faq": [("Will it print at the real card size?",
+                 "Yes. With Real card size selected, print the PDF at 100% (\u201cActual size\u201d, not \u201cFit to page\u201d) and each side comes out at 85.6 × 54 mm, the standard size for ID and bank cards."),
+                ("My form wants one file under 200 KB. Can I do that?",
+                 "Yes. Type 200 in Max file size. SafeMerge picks the best quality that fits."),
+                ("Is it safe to use with ID documents?",
+                 "Yes. Your photos never leave your device: the page is built inside your browser and nothing is uploaded.")],
     },
     {
         "slug": "split-pdf", "icon": "split", "js": ["split.js"], "body": "split", "pdfjs": True, "zip": True,

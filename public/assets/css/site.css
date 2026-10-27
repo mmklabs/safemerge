@@ -264,6 +264,17 @@ input[type=color] { width: 48px; height: 36px; border: 1px solid var(--line); bo
 .size-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; }
 .result-img { max-width: min(100%, 260px); max-height: 260px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
 
+/* ID card */
+.id-slots { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.id-slot { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.id-slot h3 { margin: 0; font-size: 15px; }
+.id-slot .dropzone { padding: 28px 12px; }
+.crop-area { display: grid; place-items: center; }
+.crop-area canvas { max-width: 100%; touch-action: none; cursor: crosshair; border-radius: 4px; }
+.slot-actions { gap: 6px; }
+.page-preview { width: 150px; cursor: default; }
+.page-preview canvas { width: 100%; height: auto; box-shadow: 0 0 0 1px var(--line); }
+
 /* Footer */
 .site-footer { border-top: 1px solid var(--line); background: var(--surface); font-size: 14px; color: var(--muted); }
 .site-footer .wrap { padding-block: 24px; display: flex; flex-wrap: wrap; gap: 16px 32px; justify-content: space-between; }
