@@ -12,6 +12,7 @@ Key facts:
 ## Tools
 - [Merge PDF](https://safemergefiles.com/merge-pdf/): Combine PDF files into one in your browser. Free, no sign-up, and your files are never uploaded.
 - [Compress PDF](https://safemergefiles.com/compress-pdf/): Reduce PDF file size to 100 KB, 200 KB, 500 KB or any size you need, right in your browser. Text stays sharp, and your file is never uploaded.
+- [Resize image](https://safemergefiles.com/resize-image/): Resize a photo or signature to exact pixels, mm or cm and a file size such as 20 KB or 50 KB, in your browser. Free, and your photo is never uploaded.
 - [Split PDF](https://safemergefiles.com/split-pdf/): Extract pages from a PDF or split it into several files in your browser. Free, and your file is never uploaded.
 - [Rotate PDF](https://safemergefiles.com/rotate-pdf/): Rotate one page or every page of a PDF in your browser. Free, and your file is never uploaded.
 - [Organize PDF](https://safemergefiles.com/organize-pdf/): Rearrange, delete and rotate PDF pages in your browser. Free, and your file is never uploaded.

@@ -77,10 +77,10 @@ All settings live in **`public/assets/js/config.js`**. Anything left empty stays
 | Claim | True? |
 |---|---|
 | "Your files never leave your device / are never uploaded" | ✅ Always, in every country, whatever ads run |
-| "SafeMerge collects no data" | ✅ The site has no analytics or tracking of its own |
+| "SafeMerge doesn't track you" | ✅ Visits are counted with cookie-free Cloudflare Web Analytics; no advertising trackers |
 | "No data is collected at all" | ⚠️ Only while AdSense is off. Once a visitor allows ad cookies, Google collects data, and the privacy page says so |
 
-Don't add Google Analytics or other trackers. It would break the promise on the privacy page. If you want visitor counts, Cloudflare Pages has built-in cookie-free **Web Analytics**. Update the privacy page if you turn it on.
+Visitor counts come from Cloudflare's cookie-free **Web Analytics** (Cloudflare dashboard → Analytics & Logs → Web Analytics). Don't add Google Analytics or other trackers: it would break the promise on the privacy page.
 
 **Before launch:** set up a real email address for `privacy@safemergefiles.com` (Cloudflare Email Routing forwards it to your Gmail for free), or change the address at the bottom of the privacy page in `scripts/build_pages.py`.
 

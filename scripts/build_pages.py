@@ -11,9 +11,9 @@ from pathlib import Path
 SITE_NAME = "SafeMerge"
 SITE_URL = "https://safemergefiles.com"  # change if you buy a different domain
 ROOT = Path(__file__).resolve().parent.parent / "public"
-VERSION = "2"  # bump to make browsers fetch fresh CSS/JS after an update
+VERSION = "3"  # bump to make browsers fetch fresh CSS/JS after an update
 GITHUB_URL = "https://github.com/mmklabs/safemerge"
-LASTMOD = "2026-10-24"  # update when page content changes, so search engines recrawl
+LASTMOD = "2026-10-27"  # update when page content changes, so search engines recrawl
 INDEXNOW_KEY = "8c42d1759bf31b4b4230e170536651d3"  # proves to Bing/IndexNow that we own the site
 
 LOGO = """<svg viewBox="0 0 32 32" aria-hidden="true">
@@ -26,6 +26,7 @@ SHIELD = """<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5l5.5 2v4c
 
 # Small line icons for the home page cards
 ICONS = {
+    "resize": '<path d="M5 9h15v15H5z"/><path d="M20 12h7v15H12v-3"/><path d="M9 20l4-4 3 3"/>',
     "compress": '<path d="M9 4h14v24H9z"/><path d="M16 7v7m-3.5-3.5L16 14l3.5-3.5M16 25v-7m-3.5 3.5L16 18l3.5 3.5"/>',
     "merge": '<path d="M6 6h10v12H6zM14 10h10v12H14z"/><path d="M18 26v4m-3-3 3 3 3-3"/>',
     "split": '<path d="M8 6h16v20H8z"/><path d="M4 16h24" stroke-dasharray="3 3"/>',
@@ -131,6 +132,78 @@ def compress_variant(kb, label, extra_faq):
         "ui": COMPRESS_UI, "steps": COMPRESS_STEPS, "faq": extra_faq + COMPRESS_FAQ,
     }
 
+RESIZE_UI = drop("Drop a photo or signature here", "an image", accept="image/*") + """
+<div id="workspace" class="tool" hidden>
+""" + file_head() + """
+  <div class="resize-layout">
+    <div class="stage-col">
+      <div class="stage-wrap"><canvas id="stage" aria-label="Preview of the resized image"></canvas></div>
+      <label id="zoom-row" class="field" hidden><span>Zoom</span><input id="zoom" type="range" min="1" max="4" step="0.01" value="1"></label>
+      <p id="stage-hint" class="meta"></p>
+    </div>
+    <div class="options">
+      <label class="field full"><span>Size</span>
+        <select id="preset">
+          <option value="original">Keep the original size</option>
+          <option value="form-photo">Form photo · 200 × 230 px · 20–50 KB</option>
+          <option value="signature">Signature · 140 × 60 px · 10–20 KB</option>
+          <option value="passport">Passport photo · 35 × 45 mm</option>
+          <option value="square">Square · 600 × 600 px</option>
+          <option value="custom">Custom size</option>
+        </select></label>
+      <div id="size-fields" class="size-fields full" hidden>
+        <label class="field"><span>Width</span><input id="w" type="number" min="1" value="200" inputmode="decimal"></label>
+        <label class="field"><span>Height</span><input id="h" type="number" min="1" value="230" inputmode="decimal"></label>
+        <label class="field"><span>Unit</span><select id="unit"><option value="px">pixels</option><option value="mm">mm</option><option value="cm">cm</option><option value="in">inches</option></select></label>
+        <label id="dpi-field" class="field" hidden><span>DPI</span><input id="dpi" type="number" min="50" max="1200" value="300" inputmode="numeric"></label>
+      </div>
+      <fieldset id="fit-field" class="field full" hidden><legend>If the shape is different</legend>""" + radios("fit", [("crop", "Crop to fill"), ("pad", "Fit inside, add white space")], "crop") + """</fieldset>
+      <div class="size-fields full">
+        <label class="field"><span>Max file size (KB)</span><input id="max-kb" type="number" min="1" placeholder="No limit" inputmode="numeric"></label>
+        <label class="field"><span>Min file size (KB)</span><input id="min-kb" type="number" min="1" placeholder="None" inputmode="numeric"></label>
+      </div>
+      <fieldset class="field full"><legend>Format</legend>""" + radios("format", [("jpg", "JPG"), ("png", "PNG")], "jpg") + """</fieldset>
+      <label class="check-row full"><input id="cleanup" type="checkbox"> Clean up signature: white background, darker ink</label>
+      <label class="check-row full"><input id="stamp" type="checkbox"> Add name and date below the photo</label>
+      <div id="stamp-fields" class="size-fields full" hidden>
+        <label class="field"><span>Name</span><input id="stamp-name" type="text" maxlength="40" autocomplete="name"></label>
+        <label class="field"><span>Date</span><input id="stamp-date" type="text" maxlength="20"></label>
+      </div>
+    </div>
+  </div>
+  <div class="bar"><span class="grow"></span><button id="run" class="btn primary" disabled>Resize image</button></div>
+  <section id="result" class="result" hidden aria-live="polite">
+    <div class="result-head"><div id="result-sizes" class="result-sizes"></div><div id="result-verdict" class="verdict"></div></div>
+    <p id="result-note" class="result-note" hidden></p>
+    <div class="result-body">
+      <img id="result-img" class="result-img" alt="Resized image">
+      <div class="result-actions"><button id="download" class="btn primary">Download</button></div>
+    </div>
+  </section>
+</div>"""
+
+RESIZE_STEPS = ["Drop your photo or signature in. Phone photos work too.",
+                "Pick a size, or type the exact pixels, mm and KB your form asks for.",
+                "Drag to position the crop, click Resize image, then download."]
+
+RESIZE_FAQ = [
+    ("My form says the photo must be 20–50 KB. How do I do that?",
+     "Type 50 in Max file size and 20 in Min file size. SafeMerge keeps the best quality that fits between the two."),
+    ("Can I add my name and the date to the photo?",
+     "Yes. Tick “Add name and date below the photo”. Some application forms require this."),
+    ("How do I make a signature photo look scanned?",
+     "Choose the Signature size or tick “Clean up signature”. It turns the paper white and the ink dark."),
+]
+
+def resize_variant(slug, h1, card, lede, data, faq):
+    return {
+        "slug": slug, "icon": "resize", "js": ["resize-image.js"], "body": "resize", "variant": True, "data": data,
+        "card": (h1, card),
+        "title": f"{h1} free, without uploading | SafeMerge",
+        "description": f"{lede} Free, no sign-up, and your photo never leaves your device.",
+        "h1": h1, "lede": lede, "ui": RESIZE_UI, "steps": RESIZE_STEPS, "faq": faq + RESIZE_FAQ,
+    }
+
 TOOLS = [
     {
         "slug": "merge-pdf", "icon": "merge", "js": ["merge.js"], "body": "merge",
@@ -162,6 +235,17 @@ TOOLS = [
         "ui": COMPRESS_UI, "steps": COMPRESS_STEPS,
         "faq": [("How do I compress a PDF to exactly 100 KB?",
                  "Choose 100 KB and click Compress PDF. SafeMerge tries gentle settings first and keeps the best-quality version that fits under your limit.")] + COMPRESS_FAQ,
+    },
+    {
+        "slug": "resize-image", "icon": "resize", "js": ["resize-image.js"], "body": "resize",
+        "card": ("Resize image", "Photos and signatures to exact pixels and KB."),
+        "title": "Resize image to KB and pixels for online forms | SafeMerge",
+        "description": "Resize a photo or signature to exact pixels, mm or cm and a file size such as 20 KB or 50 KB, in your browser. Free, and your photo is never uploaded.",
+        "h1": "Resize photo or signature",
+        "lede": "Get a photo or signature to the exact size an online form asks for: pixels, mm or cm, and KB.",
+        "ui": RESIZE_UI, "steps": RESIZE_STEPS,
+        "faq": [("Does resizing make my photo blurry?",
+                 "SafeMerge uses high-quality scaling and picks the best JPG quality that fits your size limit, so photos stay as sharp as the limit allows.")] + RESIZE_FAQ,
     },
     {
         "slug": "split-pdf", "icon": "split", "js": ["split.js"], "body": "split", "pdfjs": True, "zip": True,
@@ -355,6 +439,20 @@ TOOLS = [
 
 # Extra search-landing pages: same tools with a preset, not shown as separate cards
 VARIANTS = [
+    resize_variant("resize-image-to-20kb", "Resize image to 20 KB", "Shrink a photo under 20 KB.",
+        "Shrink a photo or signature to under 20 KB for upload forms.", {"maxkb": "20"},
+        [("Will a 20 KB photo still look clear?", "At typical form sizes such as 200 × 230 pixels, yes. Very large dimensions may need to be reduced to fit 20 KB.")]),
+    resize_variant("resize-image-to-50kb", "Resize image to 50 KB", "Shrink a photo under 50 KB.",
+        "Shrink a photo or signature to under 50 KB for upload forms.", {"maxkb": "50"},
+        [("Why do forms ask for photos under 50 KB?", "Small files keep application portals fast. SafeMerge gets you under the limit without uploading your photo.")]),
+    resize_variant("resize-image-to-100kb", "Resize image to 100 KB", "Shrink a photo under 100 KB.",
+        "Shrink a photo to under 100 KB for forms, email and websites.", {"maxkb": "100"}, []),
+    resize_variant("resize-signature", "Resize signature for online forms", "Signature to exact pixels and KB.",
+        "Turn a phone photo of your signature into a clean, correctly sized image for application forms.", {"preset": "signature"},
+        [("What size should a signature image be?", "Many forms ask for about 140 × 60 pixels and 10–20 KB. Check your form's instructions and type its exact numbers if they differ.")]),
+    resize_variant("passport-photo-size", "Passport photo size converter", "Crop a photo to 35 × 45 mm.",
+        "Crop and resize a photo to passport size, 35 × 45 mm, or any size you type.", {"preset": "passport"},
+        [("What is the standard passport photo size?", "35 × 45 mm is used by many countries, including the UK, most of Europe and Australia. The US uses 2 × 2 inches: choose Custom size and type 2 and 2 in inches.")]),
     compress_variant(100, "100 KB", [("Is 100 KB enough for a multi-page PDF?",
         "For one or two pages of text or a clear scan, usually yes. Long scanned documents may need Black & white, or fewer pages.")]),
     compress_variant(200, "200 KB", [("Why do forms ask for PDFs under 200 KB?",
@@ -466,6 +564,12 @@ def breadcrumb_schema(name, path):
 PRIVACY_FEATURES = ["Files are processed on your device and never uploaded", "Works offline",
                     "No sign-up, no watermarks, no file limits", "Source code publicly viewable on GitHub"]
 
+def body_data(t):
+    data = dict(t.get("data", {}))
+    if t.get("target"):
+        data["target"] = t["target"]
+    return "".join(f' data-{k}="{html.escape(v)}"' for k, v in data.items())
+
 def tool_page(t):
     faqs = t["faq"] + COMMON_FAQ
     others = "".join(f'<a class="tool-card" href="/{o["slug"]}/">{icon(o["icon"])}<div><h3>{o["card"][0]}</h3><p>{o["card"][1]}</p></div></a>'
@@ -476,7 +580,7 @@ def tool_page(t):
               + app_schema(f'{SITE_NAME} {t["card"][0]}', t["description"], SITE_URL + path, [t["card"][1]] + PRIVACY_FEATURES)
               + breadcrumb_schema(t["card"][0], path))
     return f"""{head(t["title"], t["description"], path, schema)}
-<body data-tool="{t["body"]}"{f' data-target="{t["target"]}"' if t.get("target") else ""}>
+<body data-tool="{t["body"]}"{body_data(t)}>
 {header()}
 <main><div class="wrap narrow">
   <h1>{t["h1"]}</h1>
@@ -539,14 +643,15 @@ def home_page():
 def privacy_page():
     body = f"""
 <h1>Privacy</h1>
-<p class="lede">Short version: your files never leave your device. The only data that can be collected is through ads, and Google ads load only if you allow them.</p>
+<p class="lede">Short version: your files never leave your device. We count visits without cookies, and Google ads load only if you allow them.</p>
 
 <h2>Your files</h2>
 <p>Every SafeMerge tool runs inside your web browser. When you choose a file, your browser reads it from your device, changes it there, and saves the result back to your device. Files are never sent to SafeMerge or anyone else. We have no server that could receive them.</p>
 <p>You can check this yourself: load a tool, turn off your internet connection, and use it. It still works.</p>
 
 <h2>What we collect</h2>
-<p>SafeMerge itself collects nothing. There are no analytics, no tracking pixels, no accounts and no SafeMerge cookies. We remember one setting in your browser's local storage, your ad cookie choice, so we don't ask again. It stays on your device.</p>
+<p>We count visits so we know how many people use SafeMerge and which tools are popular. For this we use <a href="https://www.cloudflare.com/web-analytics/" rel="noopener">Cloudflare Web Analytics</a>, which uses no cookies and does not track you as an individual or across other websites. It records things like the page visited, the referring site, country, browser and device type, and page load speed. It never sees your files.</p>
+<p>There are no accounts, no advertising trackers and no SafeMerge cookies. We remember one setting in your browser's local storage, your ad cookie choice, so we don't ask again. It stays on your device.</p>
 
 <h2>Ads</h2>
 <p>Ads keep SafeMerge free. Which ads you see depends on your choice:</p>
@@ -566,7 +671,7 @@ def privacy_page():
 
 <h2>Contact</h2>
 <p>Questions about privacy: <span class="contact-email">privacy@safemergefiles.com</span></p>
-<p style="color:var(--muted)">Last updated: October 2026</p>
+<p style="color:var(--muted)">Last updated: 27 October 2026</p>
 """
     return f"""{head(f"Privacy | {SITE_NAME}", "How SafeMerge keeps your files on your device, and exactly what the ads on this site can and cannot see.", "/privacy/")}
 <body>
