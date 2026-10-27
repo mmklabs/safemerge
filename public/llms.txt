@@ -16,6 +16,7 @@ Key facts:
 - [ID card on one page](https://safemergefiles.com/id-card-on-one-page/): Combine the front and back of an ID card, driving licence or any card onto one A4 or Letter page, at real size, as PDF or JPG. Free, and your photos are never uploaded.
 - [Unlock PDF](https://safemergefiles.com/unlock-pdf/): Remove the password from a PDF you can open, so it opens without one. Works in your browser; your file and password are never uploaded.
 - [Protect PDF](https://safemergefiles.com/protect-pdf/): Add a password to a PDF with strong AES-256 encryption, and optionally block printing or copying. Works in your browser; your file is never uploaded.
+- [OCR PDF](https://safemergefiles.com/ocr-pdf/): Turn scanned PDFs and photos of documents into searchable PDFs and copyable text, right in your browser. Free, and your scans are never uploaded.
 - [Split PDF](https://safemergefiles.com/split-pdf/): Extract pages from a PDF or split it into several files in your browser. Free, and your file is never uploaded.
 - [Rotate PDF](https://safemergefiles.com/rotate-pdf/): Rotate one page or every page of a PDF in your browser. Free, and your file is never uploaded.
 - [Organize PDF](https://safemergefiles.com/organize-pdf/): Rearrange, delete and rotate PDF pages in your browser. Free, and your file is never uploaded.

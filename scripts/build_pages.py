@@ -11,7 +11,7 @@ from pathlib import Path
 SITE_NAME = "SafeMerge"
 SITE_URL = "https://safemergefiles.com"  # change if you buy a different domain
 ROOT = Path(__file__).resolve().parent.parent / "public"
-VERSION = "5"  # bump to make browsers fetch fresh CSS/JS after an update
+VERSION = "6"  # bump to make browsers fetch fresh CSS/JS after an update
 GITHUB_URL = "https://github.com/mmklabs/safemerge"
 LASTMOD = "2026-10-27"  # update when page content changes, so search engines recrawl
 INDEXNOW_KEY = "8c42d1759bf31b4b4230e170536651d3"  # proves to Bing/IndexNow that we own the site
@@ -26,6 +26,7 @@ SHIELD = """<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5l5.5 2v4c
 
 # Small line icons for the home page cards
 ICONS = {
+    "ocr": '<path d="M5 10V5h5M22 5h5v5M27 22v5h-5M10 27H5v-5"/><path d="M10 12h12M10 16h12M10 20h8"/>',
     "unlock": '<rect x="7" y="14" width="18" height="14" rx="2"/><path d="M11 14V9a5 5 0 0 1 9.6-2"/><circle cx="16" cy="21" r="1.6"/>',
     "lock": '<rect x="7" y="14" width="18" height="14" rx="2"/><path d="M11 14V9a5 5 0 0 1 10 0v5"/><circle cx="16" cy="21" r="1.6"/>',
     "idcard": '<path d="M6 5h20v22H6z"/><rect x="9" y="8" width="14" height="7" rx="1"/><rect x="9" y="18" width="14" height="7" rx="1"/>',
@@ -316,6 +317,41 @@ def unlock_page(slug, h1, title, description, lede, faq, variant=False):
         "faq": faq + UNLOCK_FAQ,
     }
 
+OCR_UI = drop("Drop scanned PDFs or photos of documents", "PDFs or images", accept="application/pdf,.pdf,image/*", multiple=True) + """
+<div id="workspace" class="tool" hidden>
+""" + file_head() + """
+  <div class="options">
+    <fieldset class="field"><legend>Language</legend><div class="choices"><label><input type="radio" name="lang" value="eng" checked> English</label></div></fieldset>
+    <fieldset class="field"><legend>Mode</legend>""" + radios("quality", [("200", "Fast"), ("300", "Most accurate")], "300") + """</fieldset>
+  </div>
+  <div class="bar"><span class="grow"></span><button id="run" class="btn primary" disabled>Recognise text</button></div>
+  <section id="result" class="result" hidden aria-live="polite">
+    <div class="result-head"><div id="result-sizes" class="result-sizes"></div></div>
+    <p id="result-note" class="result-note"></p>
+    <label class="field"><span>Recognised text</span><textarea id="text-out" class="text-out" rows="10" readonly spellcheck="false"></textarea></label>
+    <div class="bar">
+      <button id="download" class="btn primary">Download searchable PDF</button>
+      <button id="download-txt" class="btn">Download text (.txt)</button>
+      <button id="copy-text" class="btn">Copy text</button>
+    </div>
+  </section>
+</div>"""
+
+OCR_STEPS = ["Drop a scanned PDF, or photos of a document. Several files are combined into one PDF.",
+             "Click Recognise text. Each page takes a few seconds.",
+             "Download a searchable PDF (you can search, select and copy its text), or copy the plain text."]
+
+OCR_FAQ = [
+    ("Which languages are supported?",
+     "English for now. More languages are coming. Text in other Latin-alphabet languages is often recognised too, but accents may be missed."),
+    ("How accurate is it?",
+     "Very accurate on clear printed text. Blurry photos, unusual fonts and handwriting give poorer results, so check names and numbers."),
+    ("Why does the first run take longer?",
+     "The first time, your browser downloads the text recognition engine (about 7 MB). After that it's stored on your device and starts instantly, even offline."),
+    ("Are my documents uploaded for OCR?",
+     "No. Recognition runs inside your browser. Your scans never leave your device."),
+]
+
 TOOLS = [
     {
         "slug": "merge-pdf", "icon": "merge", "js": ["merge.js"], "body": "merge",
@@ -398,6 +434,15 @@ TOOLS = [
                  "The file can't be opened without it, by you or anyone else. Keep the password somewhere safe, or keep an unprotected copy."),
                 ("Is my password sent anywhere?",
                  "No. Encryption happens in your browser. The password and the file never leave your device.")],
+    },
+    {
+        "slug": "ocr-pdf", "icon": "ocr", "js": ["ocr.js"], "body": "ocr", "pdfjs": True, "tesseract": True,
+        "card": ("OCR PDF", "Make scans searchable and copy their text."),
+        "title": "OCR PDF: make scanned PDFs searchable, privately | SafeMerge",
+        "description": "Turn scanned PDFs and photos of documents into searchable PDFs and copyable text, right in your browser. Free, and your scans are never uploaded.",
+        "h1": "OCR: make a scanned PDF searchable",
+        "lede": "Turn scans and photos of documents into PDFs you can search, select and copy text from. Or just copy the text.",
+        "ui": OCR_UI, "steps": OCR_STEPS, "faq": OCR_FAQ,
     },
     {
         "slug": "split-pdf", "icon": "split", "js": ["split.js"], "body": "split", "pdfjs": True, "zip": True,
@@ -591,6 +636,15 @@ TOOLS = [
 
 # Extra search-landing pages: same tools with a preset, not shown as separate cards
 VARIANTS = [
+    {
+        "slug": "image-to-text", "icon": "ocr", "js": ["ocr.js"], "body": "ocr", "pdfjs": True, "tesseract": True, "variant": True,
+        "card": ("Image to text", "Copy text from a photo or screenshot."),
+        "title": "Image to text: copy text from photos and scans, free | SafeMerge",
+        "description": "Extract text from a photo, screenshot or scanned image in your browser and copy it. Free, and your image is never uploaded.",
+        "h1": "Image to text",
+        "lede": "Copy the text out of a photo, screenshot or scanned document. Drop the image, then copy the text.",
+        "ui": OCR_UI, "steps": OCR_STEPS, "faq": OCR_FAQ,
+    },
     unlock_page("remove-pdf-password", "Remove password from PDF",
         "Remove password from PDF (bank statements and more), free | SafeMerge",
         "Remove the password from a PDF you have the password for, such as a bank statement, so upload forms accept it. Free, and nothing is uploaded.",
@@ -684,6 +738,8 @@ def scripts(tool=None):
         tags.append('<script src="/vendor/pdf-lib/pdf-lib.min.js" defer></script>')
         if tool.get("pdfjs"):
             tags.append('<script src="/vendor/pdfjs/pdf.min.js" defer></script>')
+        if tool.get("tesseract"):
+            tags.append('<script src="/vendor/tesseract/tesseract.min.js" defer></script>')
         if tool.get("qpdf"):
             tags.append('<script src="/vendor/qpdf/qpdf.js" defer></script>')
         if tool.get("zip"):

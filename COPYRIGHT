@@ -8,6 +8,7 @@ Third-party libraries in public/vendor/ keep their own licences:
 - pdf-lib (MIT) — public/vendor/pdf-lib/LICENSE.md
 - PDF.js (Apache 2.0) — public/vendor/pdfjs/LICENSE
 - JSZip (MIT or GPLv3) — public/vendor/jszip/LICENSE.md
+- Tesseract.js, tesseract.js-core and the English model (Apache 2.0) — public/vendor/tesseract/
 - qpdf (Apache 2.0), WebAssembly build by @neslinesli93/qpdf-wasm (ISC) — public/vendor/qpdf/
 
 Contact: privacy@safemergefiles.com

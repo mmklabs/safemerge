@@ -279,6 +279,10 @@ input[type=color] { width: 48px; height: 36px; border: 1px solid var(--line); bo
 .pw-input { display: flex; gap: 6px; }
 .pw-input input { flex: 1; min-width: 0; }
 
+/* OCR text output */
+.text-out { width: 100%; min-height: 160px; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--paper); color: var(--ink); font: 14px/1.5 var(--mono); resize: vertical; }
+
 /* Footer */
 .site-footer { border-top: 1px solid var(--line); background: var(--surface); font-size: 14px; color: var(--muted); }
 .site-footer .wrap { padding-block: 24px; display: flex; flex-wrap: wrap; gap: 16px 32px; justify-content: space-between; }
