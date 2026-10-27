@@ -111,7 +111,7 @@ window.SM = (() => {
     } catch (e) {
       throw new Error('This file could not be read as a PDF. It may be damaged.');
     }
-    if (doc.isEncrypted) throw new Error('This PDF is password-protected. Remove the password first, then try again.');
+    if (doc.isEncrypted) throw new Error('This PDF is password-protected. Remove the password with Unlock PDF first, then try again.');
     return doc;
   }
 

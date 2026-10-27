@@ -275,6 +275,10 @@ input[type=color] { width: 48px; height: 36px; border: 1px solid var(--line); bo
 .page-preview { width: 150px; cursor: default; }
 .page-preview canvas { width: 100%; height: auto; box-shadow: 0 0 0 1px var(--line); }
 
+/* Password fields */
+.pw-input { display: flex; gap: 6px; }
+.pw-input input { flex: 1; min-width: 0; }
+
 /* Footer */
 .site-footer { border-top: 1px solid var(--line); background: var(--surface); font-size: 14px; color: var(--muted); }
 .site-footer .wrap { padding-block: 24px; display: flex; flex-wrap: wrap; gap: 16px 32px; justify-content: space-between; }

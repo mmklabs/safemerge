@@ -11,7 +11,7 @@ from pathlib import Path
 SITE_NAME = "SafeMerge"
 SITE_URL = "https://safemergefiles.com"  # change if you buy a different domain
 ROOT = Path(__file__).resolve().parent.parent / "public"
-VERSION = "4"  # bump to make browsers fetch fresh CSS/JS after an update
+VERSION = "5"  # bump to make browsers fetch fresh CSS/JS after an update
 GITHUB_URL = "https://github.com/mmklabs/safemerge"
 LASTMOD = "2026-10-27"  # update when page content changes, so search engines recrawl
 INDEXNOW_KEY = "8c42d1759bf31b4b4230e170536651d3"  # proves to Bing/IndexNow that we own the site
@@ -26,6 +26,8 @@ SHIELD = """<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5l5.5 2v4c
 
 # Small line icons for the home page cards
 ICONS = {
+    "unlock": '<rect x="7" y="14" width="18" height="14" rx="2"/><path d="M11 14V9a5 5 0 0 1 9.6-2"/><circle cx="16" cy="21" r="1.6"/>',
+    "lock": '<rect x="7" y="14" width="18" height="14" rx="2"/><path d="M11 14V9a5 5 0 0 1 10 0v5"/><circle cx="16" cy="21" r="1.6"/>',
     "idcard": '<path d="M6 5h20v22H6z"/><rect x="9" y="8" width="14" height="7" rx="1"/><rect x="9" y="18" width="14" height="7" rx="1"/>',
     "resize": '<path d="M5 9h15v15H5z"/><path d="M20 12h7v15H12v-3"/><path d="M9 20l4-4 3 3"/>',
     "compress": '<path d="M9 4h14v24H9z"/><path d="M16 7v7m-3.5-3.5L16 14l3.5-3.5M16 25v-7m-3.5 3.5L16 18l3.5 3.5"/>',
@@ -258,6 +260,62 @@ IDCARD_UI = """
   </section>
 </div>"""
 
+UNLOCK_UI = drop("Drop a password-protected PDF here", "a PDF file") + """
+<div id="workspace" class="tool" hidden>
+""" + file_head() + """
+  <div id="pw-row" class="options" hidden>
+    <label class="field full"><span>Password</span>
+      <div class="pw-input"><input id="password" type="password" autocomplete="off" spellcheck="false"><button class="btn small" type="button" data-reveal="password">Show</button></div>
+    </label>
+    <div class="bar full"><span class="grow"></span><button id="run" class="btn primary">Unlock PDF</button></div>
+  </div>
+  <section id="result" class="result" hidden aria-live="polite">
+    <div class="result-head"><div id="result-sizes" class="result-sizes"></div></div>
+    <p id="result-note" class="result-note"></p>
+    <div class="bar"><button id="download" class="btn primary">Download</button></div>
+  </section>
+</div>"""
+
+PROTECT_UI = drop("Drop a PDF here", "a PDF file") + """
+<div id="workspace" class="tool" hidden>
+""" + file_head() + """
+  <div class="options">
+    <label class="field"><span>Password</span>
+      <div class="pw-input"><input id="password" type="password" autocomplete="new-password" spellcheck="false"><button class="btn small" type="button" data-reveal="password">Show</button></div></label>
+    <label class="field"><span>Type it again</span>
+      <div class="pw-input"><input id="password2" type="password" autocomplete="new-password" spellcheck="false"><button class="btn small" type="button" data-reveal="password2">Show</button></div></label>
+    <fieldset class="field full"><legend>Also block (optional)</legend>
+      <label class="check-row"><input id="no-print" type="checkbox"> Printing</label>
+      <label class="check-row"><input id="no-copy" type="checkbox"> Copying text</label>
+      <label class="check-row"><input id="no-edit" type="checkbox"> Editing</label>
+    </fieldset>
+  </div>
+  <div class="bar"><span class="grow"></span><button id="run" class="btn primary">Protect PDF</button></div>
+  <section id="result" class="result" hidden aria-live="polite">
+    <div class="result-head"><div id="result-sizes" class="result-sizes"></div></div>
+    <p id="result-note" class="result-note"></p>
+    <div class="bar"><button id="download" class="btn primary">Download</button></div>
+  </section>
+</div>"""
+
+UNLOCK_FAQ = [
+    ("Can SafeMerge unlock a PDF if I don't know the password?",
+     "No. You need the password that opens the file. If a PDF only blocks printing or copying but opens without a password, SafeMerge can remove those limits."),
+    ("Is it safe to type my password here?",
+     "Yes. The password and the file stay in your browser and are never sent anywhere. SafeMerge has no server that could receive them."),
+]
+
+def unlock_page(slug, h1, title, description, lede, faq, variant=False):
+    return {
+        "slug": slug, "icon": "unlock", "js": ["pdf-password.js"], "body": "unlock", "qpdf": True, "variant": variant,
+        "card": ("Unlock PDF", "Remove a password you know."),
+        "title": title, "description": description, "h1": h1, "lede": lede, "ui": UNLOCK_UI,
+        "steps": ["Drop the password-protected PDF in.",
+                  "Type its password (the one you use to open it).",
+                  "Click Unlock PDF and download the version without a password."],
+        "faq": faq + UNLOCK_FAQ,
+    }
+
 TOOLS = [
     {
         "slug": "merge-pdf", "icon": "merge", "js": ["merge.js"], "body": "merge",
@@ -318,6 +376,28 @@ TOOLS = [
                  "Yes. Type 200 in Max file size. SafeMerge picks the best quality that fits."),
                 ("Is it safe to use with ID documents?",
                  "Yes. Your photos never leave your device: the page is built inside your browser and nothing is uploaded.")],
+    },
+    unlock_page("unlock-pdf", "Unlock PDF",
+        "Unlock PDF: remove a password you know, privately | SafeMerge",
+        "Remove the password from a PDF you can open, so it opens without one. Works in your browser; your file and password are never uploaded.",
+        "Remove the password from a PDF you can open, so you can upload, merge or print it without typing the password every time.",
+        [("Why would I remove a password from a PDF?",
+          "Many statements and documents arrive password-protected, but upload forms and other tools reject protected files. Unlocking a copy fixes that.")]),
+    {
+        "slug": "protect-pdf", "icon": "lock", "js": ["pdf-password.js"], "body": "protect", "qpdf": True,
+        "card": ("Protect PDF", "Add a password to a PDF."),
+        "title": "Protect PDF with a password (AES-256), privately | SafeMerge",
+        "description": "Add a password to a PDF with strong AES-256 encryption, and optionally block printing or copying. Works in your browser; your file is never uploaded.",
+        "h1": "Protect PDF with a password",
+        "lede": "Add a password so only people you share it with can open the PDF. Uses strong AES-256 encryption.",
+        "ui": PROTECT_UI,
+        "steps": ["Drop your PDF in.", "Type a password twice. Optionally block printing, copying or editing.", "Click Protect PDF and download."],
+        "faq": [("How strong is the protection?",
+                 "SafeMerge uses AES-256, the strongest encryption standard PDFs support. Choose a long password: the encryption is only as strong as the password."),
+                ("What if I forget the password?",
+                 "The file can't be opened without it, by you or anyone else. Keep the password somewhere safe, or keep an unprotected copy."),
+                ("Is my password sent anywhere?",
+                 "No. Encryption happens in your browser. The password and the file never leave your device.")],
     },
     {
         "slug": "split-pdf", "icon": "split", "js": ["split.js"], "body": "split", "pdfjs": True, "zip": True,
@@ -511,6 +591,13 @@ TOOLS = [
 
 # Extra search-landing pages: same tools with a preset, not shown as separate cards
 VARIANTS = [
+    unlock_page("remove-pdf-password", "Remove password from PDF",
+        "Remove password from PDF (bank statements and more), free | SafeMerge",
+        "Remove the password from a PDF you have the password for, such as a bank statement, so upload forms accept it. Free, and nothing is uploaded.",
+        "Bank statements and many official PDFs arrive password-protected, and upload forms often reject them. Remove the password from a copy in seconds.",
+        [("Why do upload forms reject my bank statement?",
+          "Most portals can't read password-protected PDFs. Remove the password with your statement's password (often a date of birth or part of your name, as the bank's email explains), then upload the unlocked copy.")],
+        variant=True),
     resize_variant("resize-image-to-20kb", "Resize image to 20 KB", "Shrink a photo under 20 KB.",
         "Shrink a photo or signature to under 20 KB for upload forms.", {"maxkb": "20"},
         [("Will a 20 KB photo still look clear?", "At typical form sizes such as 200 × 230 pixels, yes. Very large dimensions may need to be reduced to fit 20 KB.")]),
@@ -597,6 +684,8 @@ def scripts(tool=None):
         tags.append('<script src="/vendor/pdf-lib/pdf-lib.min.js" defer></script>')
         if tool.get("pdfjs"):
             tags.append('<script src="/vendor/pdfjs/pdf.min.js" defer></script>')
+        if tool.get("qpdf"):
+            tags.append('<script src="/vendor/qpdf/qpdf.js" defer></script>')
         if tool.get("zip"):
             tags.append('<script src="/vendor/jszip/jszip.min.js" defer></script>')
         tags.append(f'<script src="/assets/js/core.js?v={v}" defer></script>')

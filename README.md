@@ -4,7 +4,7 @@ Private PDF tools that run entirely in the browser. Files are never uploaded.
 
 **Copyright © 2026 mmklabs. All rights reserved.** The code is public so anyone can verify that files never leave their device. It is not open source: see [COPYRIGHT](COPYRIGHT).
 
-**Tools:** Merge · Compress (to a target size) · Split · Rotate · Organize (reorder/delete) · Images → PDF · PDF → images · Page numbers · Watermark
+**Tools:** Merge · Compress (to a target size) · Resize image · ID card on one page · Unlock / Protect PDF · Split · Rotate · Organize (reorder/delete) · Images → PDF · PDF → images · Page numbers · Watermark
 
 It is a plain static website: HTML, CSS and JavaScript, with no server, no database and no build tools to install. Any static host can serve it for free.
 
@@ -109,3 +109,4 @@ python3 scripts/notify_indexnow.py
 - pdf-lib 1.17.1, MIT licence
 - PDF.js 3.11.174 (Mozilla), Apache 2.0 licence
 - JSZip 3.10.1, MIT licence
+- qpdf (WebAssembly build @neslinesli93/qpdf-wasm 0.3.0), Apache 2.0 licence. Used only by Unlock and Protect PDF
