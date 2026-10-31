@@ -4,7 +4,7 @@ Private PDF tools that run entirely in the browser. Files are never uploaded.
 
 **Copyright © 2026 mmklabs. All rights reserved.** The code is public so anyone can verify that files never leave their device. It is not open source: see [COPYRIGHT](COPYRIGHT).
 
-**Tools:** Merge · Compress (to a target size) · Resize image · ID card on one page · Unlock / Protect PDF · OCR (searchable PDF, image to text) · Split · Rotate · Organize (reorder/delete) · Images → PDF · PDF → images · Page numbers · Watermark
+**Tools:** Merge · Compress (to a target size) · Resize image · ID card on one page · Unlock / Protect PDF · OCR (searchable PDF, image to text) · PDF to Word · Split · Rotate · Organize (reorder/delete) · Images → PDF · PDF → images · Page numbers · Watermark
 
 It is a plain static website: HTML, CSS and JavaScript, with no server, no database and no build tools to install. Any static host can serve it for free.
 

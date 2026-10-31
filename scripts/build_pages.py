@@ -11,9 +11,9 @@ from pathlib import Path
 SITE_NAME = "SafeMerge"
 SITE_URL = "https://safemergefiles.com"  # change if you buy a different domain
 ROOT = Path(__file__).resolve().parent.parent / "public"
-VERSION = "6"  # bump to make browsers fetch fresh CSS/JS after an update
+VERSION = "7"  # bump to make browsers fetch fresh CSS/JS after an update
 GITHUB_URL = "https://github.com/mmklabs/safemerge"
-LASTMOD = "2026-10-27"  # update when page content changes, so search engines recrawl
+LASTMOD = "2026-10-31"  # update when page content changes, so search engines recrawl
 INDEXNOW_KEY = "8c42d1759bf31b4b4230e170536651d3"  # proves to Bing/IndexNow that we own the site
 
 LOGO = """<svg viewBox="0 0 32 32" aria-hidden="true">
@@ -26,6 +26,7 @@ SHIELD = """<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5l5.5 2v4c
 
 # Small line icons for the home page cards
 ICONS = {
+    "word": '<path d="M7 4h13l6 6v18H7z"/><path d="M20 4v6h6"/><path d="M11 15l2 8 3-6 3 6 2-8"/>',
     "ocr": '<path d="M5 10V5h5M22 5h5v5M27 22v5h-5M10 27H5v-5"/><path d="M10 12h12M10 16h12M10 20h8"/>',
     "unlock": '<rect x="7" y="14" width="18" height="14" rx="2"/><path d="M11 14V9a5 5 0 0 1 9.6-2"/><circle cx="16" cy="21" r="1.6"/>',
     "lock": '<rect x="7" y="14" width="18" height="14" rx="2"/><path d="M11 14V9a5 5 0 0 1 10 0v5"/><circle cx="16" cy="21" r="1.6"/>',
@@ -352,8 +353,38 @@ OCR_FAQ = [
      "No. Recognition runs inside your browser. Your scans never leave your device."),
 ]
 
-TOOLS = [
-    {
+WORD_UI = drop("Drop a PDF here", "a PDF file") + """
+<div id="workspace" class="tool" hidden>
+""" + file_head() + """
+  <div class="options">
+    <fieldset class="field full"><legend>Pages</legend>""" + radios("pagination", [("pages", "Same pages as the PDF"), ("flow", "One flowing document")], "pages") + """</fieldset>
+  </div>
+  <div class="bar"><span class="grow"></span><button id="run" class="btn primary" disabled>Convert to Word</button></div>
+  <section id="result" class="result" hidden aria-live="polite">
+    <div class="result-head"><div id="result-sizes" class="result-sizes"></div></div>
+    <p id="result-note" class="result-note"></p>
+    <div class="bar"><button id="download" class="btn primary">Download Word file</button></div>
+  </section>
+</div>"""
+
+WORD_STEPS = ["Drop your PDF in.",
+              "Keep the same pages as the PDF, or choose one flowing document.",
+              "Click Convert to Word and open the .docx in Word, Google Docs or LibreOffice."]
+
+WORD_FAQ = [
+    ("Will the Word file look exactly like the PDF?",
+     "Close, not identical. Letters, reports, CVs and contracts convert very well. Magazine layouts, forms and complicated tables keep all their text, but may need tidying. A PDF stores letters at positions on a page, not paragraphs and tables, so SafeMerge works the structure out from the layout."),
+    ("Can it convert a scanned PDF to Word?",
+     "Yes. Scanned pages are read with OCR in your browser, so they become editable text. English only for now. Check names and numbers afterwards, and note that pictures on scanned pages are not copied."),
+    ("Does it work with languages other than English?",
+     "Text in Latin-alphabet languages usually converts well. Some PDFs in non-Latin scripts and right-to-left languages don't store their letters in a readable way, so words may come out wrong. SafeMerge warns you when it spots this. Scanned pages are read in English only."),
+    ("Is my document uploaded?",
+     "No. The conversion runs inside your browser, so contracts, CVs and statements never leave your device."),
+    ("What about password-protected PDFs?",
+     "Remove the password first with Unlock PDF, then convert."),
+]
+
+TOOLS = [    {
         "slug": "merge-pdf", "icon": "merge", "js": ["merge.js"], "body": "merge",
         "card": ("Merge PDF", "Combine several PDFs into one, in any order."),
         "title": "Merge PDF files privately, without uploading | SafeMerge",
@@ -443,6 +474,15 @@ TOOLS = [
         "h1": "OCR: make a scanned PDF searchable",
         "lede": "Turn scans and photos of documents into PDFs you can search, select and copy text from. Or just copy the text.",
         "ui": OCR_UI, "steps": OCR_STEPS, "faq": OCR_FAQ,
+    },
+    {
+        "slug": "pdf-to-word", "icon": "word", "js": ["pdf-to-word.js"], "body": "word", "pdfjs": True, "tesseract": True, "zip": True,
+        "card": ("PDF to Word", "Turn a PDF into an editable Word file."),
+        "title": "PDF to Word converter that never uploads your file | SafeMerge",
+        "description": "Convert a PDF to an editable Word document (.docx) in your browser, including scanned PDFs. Free, no sign-up, and your file is never uploaded.",
+        "h1": "PDF to Word",
+        "lede": "Turn a PDF into an editable Word document, with its headings, lists, tables and images. Scanned PDFs work too.",
+        "ui": WORD_UI, "steps": WORD_STEPS, "faq": WORD_FAQ,
     },
     {
         "slug": "split-pdf", "icon": "split", "js": ["split.js"], "body": "split", "pdfjs": True, "zip": True,
@@ -636,6 +676,24 @@ TOOLS = [
 
 # Extra search-landing pages: same tools with a preset, not shown as separate cards
 VARIANTS = [
+    {
+        "slug": "pdf-to-docx", "icon": "word", "js": ["pdf-to-word.js"], "body": "word", "pdfjs": True, "tesseract": True, "zip": True, "variant": True,
+        "card": ("PDF to DOCX", "Convert a PDF to a .docx file."),
+        "title": "PDF to DOCX: convert in your browser, free | SafeMerge",
+        "description": "Convert a PDF to a .docx file that opens in Word, Google Docs and LibreOffice. Free, and your file is never uploaded.",
+        "h1": "PDF to DOCX",
+        "lede": "Get an editable .docx from any PDF. It opens in Word, Google Docs and LibreOffice.",
+        "ui": WORD_UI, "steps": WORD_STEPS, "faq": WORD_FAQ,
+    },
+    {
+        "slug": "scanned-pdf-to-word", "icon": "word", "js": ["pdf-to-word.js"], "body": "word", "pdfjs": True, "tesseract": True, "zip": True, "variant": True,
+        "card": ("Scanned PDF to Word", "Make a scan editable in Word."),
+        "title": "Scanned PDF to Word: editable text with private OCR | SafeMerge",
+        "description": "Turn a scanned PDF into an editable Word document. Text is recognised in your browser, so your scan is never uploaded. Free.",
+        "h1": "Scanned PDF to Word",
+        "lede": "Turn a scan into a Word document you can edit. Text is recognised on your device, so private papers stay private.",
+        "ui": WORD_UI, "steps": WORD_STEPS, "faq": WORD_FAQ,
+    },
     {
         "slug": "image-to-text", "icon": "ocr", "js": ["ocr.js"], "body": "ocr", "pdfjs": True, "tesseract": True, "variant": True,
         "card": ("Image to text", "Copy text from a photo or screenshot."),
