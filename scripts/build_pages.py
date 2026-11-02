@@ -11,7 +11,7 @@ from pathlib import Path
 SITE_NAME = "SafeMerge"
 SITE_URL = "https://safemergefiles.com"  # change if you buy a different domain
 ROOT = Path(__file__).resolve().parent.parent / "public"
-VERSION = "7"  # bump to make browsers fetch fresh CSS/JS after an update
+VERSION = "8"  # bump to make browsers fetch fresh CSS/JS after an update
 GITHUB_URL = "https://github.com/mmklabs/safemerge"
 LASTMOD = "2026-10-31"  # update when page content changes, so search engines recrawl
 INDEXNOW_KEY = "8c42d1759bf31b4b4230e170536651d3"  # proves to Bing/IndexNow that we own the site
@@ -938,6 +938,9 @@ def privacy_page():
 </tbody></table></div>
 <p>Ad companies never get your files or anything in them. You can change your choice at any time with the <em>Ad cookie choice</em> link at the bottom of every page.</p>
 
+<h2>Donations</h2>
+<p>If you choose to support us by UPI, the QR code is drawn on your device and the payment happens in your own UPI app, between your bank and ours. This website never sees your payment or bank details.</p>
+
 <h2>Hosting</h2>
 <p>Like every website, our hosting provider handles the requests that load these pages and may keep standard server logs (such as IP address and time) for security. Those requests never contain your files.</p>
 
@@ -946,7 +949,7 @@ def privacy_page():
 
 <h2>Contact</h2>
 <p>Questions about privacy: <span class="contact-email">privacy@safemergefiles.com</span></p>
-<p style="color:var(--muted)">Last updated: 27 October 2026</p>
+<p style="color:var(--muted)">Last updated: 2 November 2026</p>
 """
     return f"""{head(f"Privacy | {SITE_NAME}", "How SafeMerge keeps your files on your device, and exactly what the ads on this site can and cannot see.", "/privacy/")}
 <body>

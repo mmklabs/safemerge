@@ -1,15 +1,15 @@
 // Offline support: keeps a copy of the site so tools work without internet.
 // Bump CACHE when you deploy changes so visitors get the new files.
-const CACHE = 'safemerge-v7';
+const CACHE = 'safemerge-v8';
 const FILES = [
   '/', '/merge-pdf/', '/compress-pdf/', '/resize-image/', '/id-card-on-one-page/', '/unlock-pdf/', '/protect-pdf/', '/ocr-pdf/', '/split-pdf/', '/rotate-pdf/', '/organize-pdf/', '/jpg-to-pdf/',
   '/pdf-to-jpg/', '/add-page-numbers/', '/watermark-pdf/', '/privacy/',
-  '/assets/css/site.css?v=7', '/assets/img/icon.svg', '/manifest.webmanifest',
-  '/assets/js/config.js?v=7', '/assets/js/monetize.js?v=7', '/assets/js/core.js?v=7',
-  '/assets/js/tools/merge.js?v=7', '/assets/js/tools/split.js?v=7', '/assets/js/tools/pages.js?v=7',
-  '/assets/js/tools/images-to-pdf.js?v=7', '/assets/js/tools/pdf-to-images.js?v=7', '/assets/js/tools/stamp.js?v=7', '/assets/js/tools/compress.js?v=7', '/assets/js/tools/resize-image.js?v=7', '/assets/js/tools/id-card.js?v=7', '/assets/js/tools/pdf-password.js?v=7', '/assets/js/tools/ocr.js?v=7', '/assets/js/tools/pdf-to-word.js?v=7',
+  '/assets/css/site.css?v=8', '/assets/img/icon.svg', '/manifest.webmanifest',
+  '/assets/js/config.js?v=8', '/assets/js/monetize.js?v=8', '/assets/js/core.js?v=8',
+  '/assets/js/tools/merge.js?v=8', '/assets/js/tools/split.js?v=8', '/assets/js/tools/pages.js?v=8',
+  '/assets/js/tools/images-to-pdf.js?v=8', '/assets/js/tools/pdf-to-images.js?v=8', '/assets/js/tools/stamp.js?v=8', '/assets/js/tools/compress.js?v=8', '/assets/js/tools/resize-image.js?v=8', '/assets/js/tools/id-card.js?v=8', '/assets/js/tools/pdf-password.js?v=8', '/assets/js/tools/ocr.js?v=8', '/assets/js/tools/pdf-to-word.js?v=8',
   '/vendor/pdf-lib/pdf-lib.min.js', '/vendor/pdfjs/pdf.min.js', '/vendor/pdfjs/pdf.worker.min.js',
-  '/vendor/jszip/jszip.min.js',
+  '/vendor/jszip/jszip.min.js', '/vendor/qrcode/qrcode.js',
 ];
 
 self.addEventListener('install', (e) => {

@@ -15,5 +15,12 @@ window.SAFEMERGE_CONFIG = {
 
   // Donation page (Ko-fi, Buy Me a Coffee, GitHub Sponsors…).
   // Example: 'https://ko-fi.com/safemerge'
-  donateUrl: '',
+  donateUrl: 'https://ko-fi.com/safemerge',
+
+  // UPI ID for donations. Shown only to visitors whose browser time zone is
+  // Asia/Kolkata, with a pay button on phones and a QR code drawn on the device.
+  // Example: 'safemerge@upi'
+  upiId: 'arunmohan92@upi',
+  // Name shown in the visitor's UPI app before they pay
+  upiName: 'SafeMerge',
 };
